@@ -1,0 +1,13 @@
+POST http://localhost:5000/api/report
+Content-Type: application/json
+
+{
+  "studentName": "Sarthak",
+  "rollNo": "101",
+  "className": "10",
+  "subjects": [
+    { "name": "Math", "marks": 90 },
+    { "name": "Science", "marks": 80 },
+    { "name": "English", "marks": 70 }
+  ]
+}

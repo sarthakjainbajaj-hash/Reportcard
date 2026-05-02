@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - ReportCard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body onload="checkAuth(); fetchHistory();">
+
+<header>
+  <h1>ReportCard Generator</h1>
+  <button class="outline" onclick="logout()">Logout</button>
+</header>
+
+<div class="container flex-gap">
+  <!-- Generation Form -->
+  <div class="glass-card" style="flex: 1;">
+    <h2>Create New Report</h2>
+    
+    <div class="form-group" style="margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+      <h3 style="font-size: 1.1rem; margin-bottom: 1rem; text-align: left;">Institution Details</h3>
+      <div class="form-group">
+        <input id="school" type="text" placeholder="School Name" required>
+      </div>
+      <div class="flex-gap">
+        <input id="principal" type="text" placeholder="Principal's Name" required>
+        <input id="director" type="text" placeholder="Director's Name" required>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 1rem;">
+      <h3 style="font-size: 1.1rem; margin-bottom: 1rem; text-align: left;">Student Details</h3>
+      <div class="flex-gap" style="margin-bottom: 1rem;">
+        <input id="name" type="text" placeholder="Student Name" required>
+        <input id="father" type="text" placeholder="Father's Name" required>
+      </div>
+      <div class="flex-gap">
+        <input id="roll" type="text" placeholder="Roll No" required>
+        <input id="class" type="text" placeholder="Class" required>
+      </div>
+    </div>
+    
+    <h3 class="mb-1 text-center" style="font-size: 1.2rem; margin-top: 1.5rem;">Subjects</h3>
+    <div id="subjects-container">
+      <!-- Dynamic subjects will go here -->
+    </div>
+    
+    <button class="outline mb-1" onclick="addSubjectRow()">+ Add Subject</button>
+    <button onclick="generate()">Generate Report</button>
+  </div>
+  
+  <!-- Report Card Result / History -->
+  <div style="flex: 1;">
+    <div class="glass-card">
+      <h2>Recent Reports</h2>
+      <div id="history-container" class="history-grid">
+        <!-- History cards go here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

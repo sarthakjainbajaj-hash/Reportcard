@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Card</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body onload="loadReport()">
+
+<header class="no-print">
+  <h1>ReportCard View</h1>
+  <div>
+    <button class="outline" onclick="window.location='index.html'">Back to Dashboard</button>
+    <button onclick="window.print()">Print Report</button>
+  </div>
+</header>
+
+<div class="container" style="max-width: 600px;">
+  <div id="result-container" style="display: none;">
+    <!-- Generated Report Card goes here -->
+  </div>
+  <div id="loading">Loading report...</div>
+  <div id="error" style="color: var(--danger); display: none;"></div>
+</div>
+
+<style>
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white; padding: 0; }
+    .report-card { box-shadow: none; border: 1px solid #cbd5e1; }
+  }
+</style>
+
+<script>
+  // Inline script just for this page to keep logic contained
+  const API = window.location.protocol === 'file:' ? 'http://localhost:5000' : '';
+
+  async function loadReport() {
+    const token = localStorage.getItem("token");
+    if (!token) return window.location = "login.html";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    if (!id) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').innerText = "No report ID provided.";
+      document.getElementById('error').style.display = 'block';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/report/${id}`, {
+        headers: { "Authorization": token }
+      });
+
+      if (!res.ok) throw new Error("Failed to load report");
+
+      const report = await res.json();
+      
+      document.getElementById('loading').style.display = 'none';
+      renderReportCard(report);
+    } catch (err) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').innerText = err.message;
+      document.getElementById('error').style.display = 'block';
+    }
+  }
+
+  function renderReportCard(report) {
+    const container = document.getElementById("result-container");
+    container.style.display = "block";
+    
+    let subjectsHtml = report.subjects.map(sub => `
+      <tr>
+        <td>${sub.name}</td>
+        <td>${sub.marks}</td>
+      </tr>
+    `).join('');
+
+    container.innerHTML = `
+      <div class="report-card" style="padding: 3rem;">
+        <div class="report-header" style="margin-bottom: 2rem;">
+          <h1 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem; text-transform: uppercase;">
+            ${report.schoolName || 'School Name'}
+          </h1>
+          <h2 style="font-size: 1.5rem; color: #475569; border: none; padding: 0;">Official Student Report Card</h2>
+        </div>
+        
+        <div class="student-info" style="grid-template-columns: 1fr 1fr; background: #f8fafc; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+          <div><strong>Student Name:</strong> ${report.studentName}</div>
+          <div><strong>Father's Name:</strong> ${report.fatherName || 'N/A'}</div>
+          <div><strong>Roll No:</strong> ${report.rollNo}</div>
+          <div><strong>Class:</strong> ${report.className}</div>
+        </div>
+        
+        <table class="marks-table" style="margin-bottom: 2rem;">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Marks</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${subjectsHtml}
+          </tbody>
+        </table>
+        
+        <div class="report-summary" style="margin-bottom: 4rem; padding: 1.5rem;">
+          <div>Total Marks: ${report.total}</div>
+          <div>Percentage: ${report.percentage.toFixed(2)}%</div>
+          <div>Overall Grade: <span class="grade-badge grade-${report.grade}">${report.grade}</span></div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 5rem; padding: 0 2rem;">
+          <div style="text-align: center;">
+            <div style="width: 200px; border-bottom: 2px solid #1e293b; height: 50px;"></div>
+            <div style="margin-top: 0.5rem; font-weight: 600;">${report.principalName || 'Principal'}</div>
+            <div style="font-size: 0.85rem; color: #64748b;">Principal</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="width: 200px; border-bottom: 2px solid #1e293b; height: 50px;"></div>
+            <div style="margin-top: 0.5rem; font-weight: 600;">${report.directorName || 'Director'}</div>
+            <div style="font-size: 0.85rem; color: #64748b;">Director</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+</script>
+</body>
+</html>
